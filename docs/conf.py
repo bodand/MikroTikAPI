@@ -24,6 +24,7 @@ breathe_projects = {}
 if read_the_docs_build:
     input_dir = '../include'
     output_dir = '_build'
+    print('We are here: ', os.path.dirname(os.path.realpath(__file__)))
     configureDoxyfile(input_dir, output_dir)
     subprocess.call(['doxygen', 'Doxyfile'], shell=True)
     for f in listdir('_build/xml'):
