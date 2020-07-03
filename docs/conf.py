@@ -2,6 +2,8 @@
 import subprocess
 import os
 
+from os import listdir
+
 
 def configureDoxyfile(_in, out):
     with open('Doxyfile.in', 'r') as file:
@@ -24,6 +26,8 @@ if read_the_docs_build:
     output_dir = '_build/docs'
     configureDoxyfile(input_dir, output_dir)
     subprocess.call(['doxygen', 'Doxyfile'], shell=True)
+    for f in listdir('_build/docs/xml'):
+        print(f)
     breathe_projects['MikroTikApi'] = output_dir + '/xml'
 
 
