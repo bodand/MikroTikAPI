@@ -21,9 +21,9 @@ breathe_projects = {}
 
 if read_the_docs_build:
     input_dir = '../include'
-    output_dir = 'build/docs'
+    output_dir = '_build/docs'
     configureDoxyfile(input_dir, output_dir)
-    subprocess.call('doxygen', shell=True, cwd='build/docs')
+    subprocess.call(['doxygen', 'Doxyfile'], shell=True, cwd='_build/docs')
     breathe_projects['MikroTikApi'] = output_dir + '/xml'
 
 
