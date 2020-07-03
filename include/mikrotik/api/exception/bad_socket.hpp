@@ -44,9 +44,31 @@
 #include <mikrotik_api_export.h>
 
 namespace mikrotik::api {
+    /**
+     * \brief: Exception to describe a failure that occurred while using
+     * sockets
+     *
+     * An exception wrapping all failures that originate from the resident
+     * socket implementation. On POSIX implementations some errno values
+     * are translated to english, while on WinSock2 they are just the error's names,
+     * although some warnings may get translated in the future.
+     *
+     * \since v1.0.0
+     */
     struct MIKROTIK_API_EXPORT bad_socket : std::exception {
+        /**
+         * Creates a bad_socket exception with the provided
+         * reason for the error.
+         *
+         * \param reason A string describing the error
+         *
+         * \since v1.0.0
+         */
         explicit bad_socket(std::string_view reason = "unknown error");
 
+        /**
+         * \copydoc bad_ip_format::what()
+         */
         const char* what() const noexcept override;
     private:
         std::string _reason;

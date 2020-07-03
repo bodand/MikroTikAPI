@@ -4,6 +4,7 @@
 ### Build dirs
 _build*/
 GetDependency.cmake
+docs/html
 
 # Created by .ignore support plugin (hsz.mobi)
 ### C++ template

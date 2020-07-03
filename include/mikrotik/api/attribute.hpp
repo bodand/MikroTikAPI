@@ -34,19 +34,58 @@
 #pragma once
 
 // stdlib
-#include <string_view>
 #include <string>
+#include <string_view>
 
 // project
 #include <mikrotik_api_export.h>
 
 namespace mikrotik::api {
+    /**
+     * \brief A little utility class containing an attribute name and a value
+     *
+     * A simple utility class, mostly used by the DSL.
+     * Upon creation it formats the values into `=<name>=<value>`, where value
+     * may be empty.
+     *
+     * \since v1.0.0
+     */
     struct MIKROTIK_API_EXPORT attribute {
+        /**
+         * \brief A construct valueless attribute
+         *
+         * Constructs an attribute with the specified name with
+         * the empty string as a value.
+         *
+         * The attribute will be in the form `=<name>=`.
+         *
+         * \param name The name of the attribute to create
+         *
+         * \since v1.0.0
+         */
         attribute(std::string_view name);
+        /**
+         * \copydoc attribute(std::string_view)
+         */
         attribute(const char* name);
+        /**
+         * \brief A construct an attribute with a specified value
+         *
+         * Constructs an attribute with the specified name with the
+         * specified value.
+         * The attribute will be in the form `=<name>=<value>`.
+         *
+         * \param name The name of the attribute to create
+         * \param value The value of the attribute to create
+         *
+         * \since v1.0.0
+         */
         attribute(std::string_view name, std::string_view value);
-        attribute(const char* name, const char * value);
+        /**
+         * \copydoc attribute(std::string_view, std::string_view)
+         */
+        attribute(const char* name, const char* value);
 
-        std::string value;
+        std::string value; ///< The attribute in the required format for MikroTik
     };
 }

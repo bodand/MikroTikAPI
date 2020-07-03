@@ -28,30 +28,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-## Create target
-add_executable(mikrottyk main.cpp)
+include(FindPackageHandleStandardArgs)
 
-## C++17
-target_compile_features(mikrottyk PRIVATE cxx_std_17)
-set_target_properties(mikrottyk PROPERTIES
-                      CXX_STANDARD 17)
+find_program(SPHINX_EXECUTABLE
+             NAMES sphinx-build
+             DOC "Path to sphinx-build executable")
 
-## use warnings;
-target_compile_options(mikrottyk PRIVATE
-                       ${${API_PROJECT_NAME}_WARNINGS}
-                       $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall>
-                       )
-
-## Link dependencies
-target_link_libraries(mikrottyk
-                      PRIVATE mikrotik::mikrotikapi
-                      PRIVATE cxxopts$<$<NOT:$<STREQUAL:"${cxxopts_LINK_AS}","">>:::cxxopts>
-                      PRIVATE fmt::fmt
-                      PRIVATE magic_enum::magic_enum)
-
-## Copy dynamic libraries if needed
-if (${API_PROJECT_NAME}_BUILD_SHARED)
-    add_custom_command(TARGET mikrottyk POST_BUILD
-                       COMMENT "Copying dynamic libraries"
-                       COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mikrotik::mikrotikapi>" "${PROJECT_BINARY_DIR}/tty")
-endif ()
+find_package_handle_standard_args(Sphinx
+                                  "Failed to find sphinx-build executable"
+                                  SPHINX_EXECUTABLE)

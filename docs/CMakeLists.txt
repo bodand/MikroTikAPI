@@ -28,30 +28,38 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-## Create target
-add_executable(mikrottyk main.cpp)
+find_package(Doxygen REQUIRED)
+find_package(Sphinx REQUIRED)
 
-## C++17
-target_compile_features(mikrottyk PRIVATE cxx_std_17)
-set_target_properties(mikrottyk PROPERTIES
-                      CXX_STANDARD 17)
+## Doxygen #####################################################################
+set(DOXYGEN_INCLUDE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/../include")
+set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
-## use warnings;
-target_compile_options(mikrottyk PRIVATE
-                       ${${API_PROJECT_NAME}_WARNINGS}
-                       $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall>
-                       )
+configure_file(
+        Doxyfile.in Doxyfile
+        @ONLY
+)
 
-## Link dependencies
-target_link_libraries(mikrottyk
-                      PRIVATE mikrotik::mikrotikapi
-                      PRIVATE cxxopts$<$<NOT:$<STREQUAL:"${cxxopts_LINK_AS}","">>:::cxxopts>
-                      PRIVATE fmt::fmt
-                      PRIVATE magic_enum::magic_enum)
+add_custom_command(
+        COMMENT "Generating documentation"
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/xml/index.xml"
+        BYPRODUCT "${CMAKE_CURRENT_BINARY_DIR}/html/index.html"
+        COMMAND "${DOXYGEN_EXECUTABLE}" Doxyfile
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+)
 
-## Copy dynamic libraries if needed
-if (${API_PROJECT_NAME}_BUILD_SHARED)
-    add_custom_command(TARGET mikrottyk POST_BUILD
-                       COMMENT "Copying dynamic libraries"
-                       COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mikrotik::mikrotikapi>" "${PROJECT_BINARY_DIR}/tty")
-endif ()
+add_custom_target(docs-doxy ALL
+                  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/xml/index.xml")
+
+## Sphinx ######################################################################
+set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
+set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/)
+
+add_custom_target(docs ALL
+                  COMMENT "Generating documentation with Sphinx"
+                  COMMAND "${SPHINX_EXECUTABLE}" -b html
+                  "${SPHINX_SOURCE}" "${SPHINX_BUILD}"
+                  "-Dbreathe_projects.MikroTikApi=${DOXYGEN_OUTPUT_DIRECTORY}/xml"
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  )
+add_dependencies(docs docs-doxy)
