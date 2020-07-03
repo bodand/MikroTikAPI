@@ -1,8 +1,7 @@
 # -- Read the docs integration -----------------------------------------------
 import subprocess
 import os
-
-from os import listdir
+import pathlib
 
 
 def configureDoxyfile(_in, out):
@@ -23,12 +22,10 @@ breathe_projects = {}
 
 if read_the_docs_build:
     input_dir = '../include'
-    output_dir = '_build'
-    print('We are here: ', os.path.dirname(os.path.realpath(__file__)))
+    output_dir = '_build/docs'
+    pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
     configureDoxyfile(input_dir, output_dir)
     subprocess.call(['doxygen', 'Doxyfile'], shell=True)
-    for f in listdir('_build/xml'):
-        print('In _build/xml: ', f)
     breathe_projects['MikroTikApi'] = output_dir + '/xml'
 
 
@@ -42,7 +39,6 @@ release = 'v1.0.1'
 # -- General configuration ---------------------------------------------------
 extensions = [
     'sphinx.ext.todo',
-    'sphinx.ext.githubpages',
     'breathe'
 ]
 breathe_default_project = "MikroTikApi"
