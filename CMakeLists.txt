@@ -42,7 +42,7 @@ include(CMakeDependentOption)
 
 ## Project
 project(MikroTikApi
-        VERSION 1.0
+        VERSION 1.1.0
         LANGUAGES CXX)
 
 ## Project options
