@@ -69,15 +69,18 @@ mikrotik::api::api_handler::mk_addr(const mikrotik::api::ip_address& address) co
     return ret;
 }
 
-void
-mikrotik::api::api_handler::disconnect() {
+int
+mikrotik::api::api_handler::disconnect() noexcept {
+    int ret = 0;
     if (sock::is_valid(_sock)) {
-        sock::close(_sock);
+        ret = sock::close(_sock);
     }
     sock::finish();
+    _sock = INVALID_SOCKET;
+    return ret;
 }
 
-mikrotik::api::api_handler::~api_handler() {
+mikrotik::api::api_handler::~api_handler() noexcept {
     disconnect();
 }
 
@@ -181,7 +184,7 @@ mikrotik::api::api_handler::login(std::string_view usr, std::string_view passwd)
 }
 
 void
-mikrotik::api::api_handler::send(mikrotik::api::sentence snt) {
+mikrotik::api::api_handler::send(const mikrotik::api::sentence& snt) {
     for (const auto& word : snt.words()) {
         send_word(word);
     }

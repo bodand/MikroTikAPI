@@ -42,11 +42,41 @@
 #include <mikrotik_api_export.h>
 
 namespace mikrotik::api {
+    /**
+     * \brief Exception describing failures occurring during handling
+     * words
+     *
+     * An exception that describes words that caused problems. For example
+     * such a situation is a word that's too long
+     * (ie. its length takes more than four bytes to represent).
+     *
+     * \rst
+     * .. note::
+     *  The exception may not contain the whole word, just a representation
+     *  of it. For example a word containing 50 million characters is a word
+     *  that's too long to handle so trying to process it will cause this exception.
+     *  The word in the exception will only contain the first and last 4 characters
+     *  and an indication about the amount of characters omitted.
+     * \endrst
+     *
+     * \since v1.0.0
+     */
     struct MIKROTIK_API_EXPORT bad_word : std::exception {
+        /**
+         * Creates a bad_word exception with the provided
+         * word and the reason for the error.
+         *
+         * \param word The word that caused the error
+         * \param reason A string describing the error
+         *
+         * \since v1.0.0
+         */
         explicit bad_word(std::string_view word, std::string_view reason = "unknown error");
 
+        /**
+         * \copydoc bad_ip_format::what()
+         */
         const char* what() const noexcept override;
-
     private:
         std::string _reason;
         std::string _word;

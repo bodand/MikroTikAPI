@@ -42,7 +42,7 @@ include(CMakeDependentOption)
 
 ## Project
 project(MikroTikApi
-        VERSION 1.0
+        VERSION 1.1.0
         LANGUAGES CXX)
 
 ## Project options
@@ -55,6 +55,8 @@ endif ()
 option(${PROJECT_NAME}_BUILD_TESTS "Build the ${PROJECT_NAME} test suite [Off as dependency]"
        ${${PROJECT_NAME}_MAIN})
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build the ${PROJECT_NAME} usage examples [Off]" Off)
+option(${PROJECT_NAME}_BUILD_DOCS
+       "Build the ${PROJECT_NAME} documentation (Requires: 'Doxygen', 'Sphinx', and the 'breathe' and 'sphinx_rtd_theme' pip packages) [Off]" Off)
 cmake_dependent_option(${PROJECT_NAME}_BUILD_SHARED "Build ${PROJECT_NAME} as shared library [Off when testing]" On
                        "NOT ${PROJECT_NAME}_BUILD_TESTS" Off)
 NameOption(${${PROJECT_NAME}_BUILD_SHARED} "SHARED;STATIC" ${PROJECT_NAME}_TARGET_TYPE)
@@ -65,9 +67,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 
 ## Project level macros
 set(${PROJECT_NAME}_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
-set(${PROJECT_NAME}_HEADER_PATH "${${PROJECT_NAME}_INCLUDE_DIR}/MikroTikApi")
-set(${PROJECT_NAME}_TARGET "${PROJECT_NAME}")
-set(${PROJECT_NAME}_NAMESPACE mikrotik::api)
+set(${PROJECT_NAME}_HEADER_PATH "${${PROJECT_NAME}_INCLUDE_DIR}/mikrotik/api")
+set(${PROJECT_NAME}_TARGET mikrotikapi)
+set(${PROJECT_NAME}_NAMESPACE mikrotik::mikrotikapi)
 
 ## Create target
 add_library(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_TARGET_TYPE}
@@ -142,7 +144,12 @@ if (${PROJECT_NAME}_BUILD_EXAMPLES)
     add_subdirectory(example)
 endif ()
 
-install(TARGETS ${PROJECT_NAME}
+## Optionally build docs
+if (${PROJECT_NAME}_BUILD_DOCS)
+    add_subdirectory(docs)
+endif ()
+
+install(TARGETS ${${PROJECT_NAME}_TARGET}
         EXPORT ${PROJECT_NAME}Targets
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
@@ -154,6 +161,11 @@ install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mikrotik_api_export.h"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         )
+
+install(DIRECTORY
+        "${${PROJECT_NAME}_INCLUDE_DIR}/mikrotik"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        FILES_MATCHING PATTERN "*.hpp")
 
 write_basic_package_version_file(
         ${PROJECT_NAME}ConfigVersion.cmake

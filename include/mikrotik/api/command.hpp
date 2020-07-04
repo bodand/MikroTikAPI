@@ -44,22 +44,101 @@
 #include <mikrotik_api_export.h>
 
 namespace mikrotik::api {
+    /**
+     * \brief A command to send and to execute on the MikroTik device
+     *
+     * A command is a word that can be executed by the MikroTik device it's sent
+     * to. This is always the first word to be sent to the device and may be
+     * followed by attribute or query words that either provide required
+     * information for the command's execution, or filter the output provided
+     * by it respectively.
+     *
+     * A DSL is provided by the library to allow easy creation of commands
+     * by utilizing the ``_cmd`` user defined literal on strings,
+     * which invokes the first constructor.
+     *
+     * \since v1.0.0
+     */
     struct MIKROTIK_API_EXPORT command {
+        /**
+         * \brief Creates a command from a string
+         *
+         * Takes a string and prepends a forward slash to it to
+         * create a command. This is then sent to the MikroTik device
+         * so the given string with the prepended slash must be a valid
+         * MikroTik API command word.
+         *
+         * \param cmd The string to turn into a command
+         *
+         * \since v1.0.0
+         */
         command(std::string_view cmd);
 
-        command(const command& cp) = default;
-        command(command&& mv) noexcept = default;
-        command& operator=(const command& cp) = default;
-        command& operator=(command&& mv) noexcept = default;
+        std::string cmd; ///< The command as a string ready to be sent
 
-        std::string cmd;
-
+        /**
+         * \brief Appends a string to a command
+         *
+         * Takes a command and adds a new part to it by concatenating
+         * a forward slash and the provided string.
+         *
+         * For example:
+         * \code
+         * auto cmd = "system"_cmd;           // -> /system
+         * cmd = cmd / "resource" / "print"; // -> /system/resource/print
+         * \endcode
+         *
+         * \param nxt The string to append
+         * \return The new command
+         *
+         * \since v1.0.0
+         */
         command operator/(std::string_view nxt) &&;
+        /**
+         * \copydoc command::operator/(std::string_view)&&
+         */
         command operator/(std::string_view nxt) const&;
 
+        /**
+         * \brief Creates a sentence from the command with an attribute
+         *
+         * Takes the command and promotes it to a sentence by taking the command
+         * and adding an attribute word.
+         *
+         * \param attr The attribute to add to create the sentence
+         * \return The newly created sentence
+         *
+         * \sa attribute
+         * \sa sentence
+         *
+         * \since v1.0.0
+         */
         sentence operator[](const attribute& attr) const;
+        /**
+         * \brief Creates a sentence from the command with a query
+         *
+         * Takes the command and promotes it to a sentence by taking the command
+         * and adding a query word.
+         *
+         * \param query The query to add to create the sentence
+         * \return The newly created sentence
+         *
+         * \sa query
+         * \sa sentence
+         *
+         * \since v1.0.0
+         */
         sentence operator()(const query& query) const;
 
+        /**
+         * \brief Implicit conversion operator to a sentence.
+         *
+         * Promotes the command to a sentence with one word: this command.
+         *
+         * \return The new sentence
+         *
+         * \since v1.0.0
+         */
         operator sentence() const;
 
     private:
@@ -67,6 +146,21 @@ namespace mikrotik::api {
     };
 
     inline namespace literals {
+        /**
+         * \brief Creates a command from a string literal
+         *
+         * Takes a string literal and returns a command
+         * from it by prepending a forward slash to it.
+         *
+         * For more information about the construction
+         * see command::command(std::string_view)
+         *
+         * \param str The string to create the command from
+         * \param n The length of the string
+         * \return The created command
+         *
+         * \since v1.0.0
+         */
         MIKROTIK_API_EXPORT
         command operator""_cmd(const char* str, std::size_t n);
     }

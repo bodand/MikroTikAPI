@@ -42,9 +42,34 @@
 #include <mikrotik_api_export.h>
 
 namespace mikrotik::api {
+    /**
+     * \brief The exception thrown if the provided string does not contain a valid IPv4 address
+     *
+     * This exception is thrown by ip_address if the string provided does not
+     * fit the requirements of an IPv4 address.
+     * Most plausible causes are:
+     *  - Does not contain all four bytes
+     *  - Contains non digit values
+     *  - Contains an inappropriate amount of separator periods
+     *
+     * \since v1.0.0
+     */
     struct MIKROTIK_API_EXPORT bad_ip_format : std::exception {
+        /**
+         * Creates a bad_ip_format exception with the provided
+         * ill-formed IPv4 address string
+         *
+         * \param faulty_address The string containing the ill-formed IPv4 address
+         *
+         * \since v1.0.0
+         */
         explicit bad_ip_format(std::string_view faulty_address) noexcept;
 
+        /**
+         * Returns a formatted error message about the error
+         * \return A c-string with the error message
+         * \since v1.0.0
+         */
         const char* what() const noexcept override;
     private:
         std::string _bad_ip;
