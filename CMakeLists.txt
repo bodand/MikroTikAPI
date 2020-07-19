@@ -32,32 +32,37 @@
 ## CMake shenanigans
 cmake_minimum_required(VERSION 3.14)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-
-include(utils)
 enable_language(CXX)
+
+## Modules #####################################################################
+include(utils)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
 include(CMakeDependentOption)
 
-## Project
+## Project #####################################################################
 project(MikroTikApi
-        VERSION 1.1.0
+        VERSION 1.1.1
         LANGUAGES CXX)
 
-## Project options
+## Project configuration #######################################################
+
+## Check if main project
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(${PROJECT_NAME}_MAIN On)
 else ()
     set(${PROJECT_NAME}_MAIN Off)
 endif ()
 
-option(${PROJECT_NAME}_BUILD_TESTS "Build the ${PROJECT_NAME} test suite [Off as dependency]"
-       ${${PROJECT_NAME}_MAIN})
-option(${PROJECT_NAME}_BUILD_EXAMPLES "Build the ${PROJECT_NAME} usage examples [Off]" Off)
+option(${PROJECT_NAME}_BUILD_TESTS
+       "Build the ${PROJECT_NAME} test suite [Off as dependency]" ${${PROJECT_NAME}_MAIN})
+option(${PROJECT_NAME}_BUILD_EXAMPLES
+       "Build the ${PROJECT_NAME} usage examples [Off]" Off)
 option(${PROJECT_NAME}_BUILD_DOCS
        "Build the ${PROJECT_NAME} documentation (Requires: 'Doxygen', 'Sphinx', and the 'breathe' and 'sphinx_rtd_theme' pip packages) [Off]" Off)
-cmake_dependent_option(${PROJECT_NAME}_BUILD_SHARED "Build ${PROJECT_NAME} as shared library [Off when testing]" On
+cmake_dependent_option(${PROJECT_NAME}_BUILD_SHARED
+                       "Build ${PROJECT_NAME} as shared library [Off when testing]" On
                        "NOT ${PROJECT_NAME}_BUILD_TESTS" Off)
 NameOption(${${PROJECT_NAME}_BUILD_SHARED} "SHARED;STATIC" ${PROJECT_NAME}_TARGET_TYPE)
 message(STATUS "[${PROJECT_NAME}] Building ${${PROJECT_NAME}_TARGET_TYPE} library")
@@ -70,6 +75,8 @@ set(${PROJECT_NAME}_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(${PROJECT_NAME}_HEADER_PATH "${${PROJECT_NAME}_INCLUDE_DIR}/mikrotik/api")
 set(${PROJECT_NAME}_TARGET mikrotikapi)
 set(${PROJECT_NAME}_NAMESPACE mikrotik::mikrotikapi)
+
+## MikroTikAPI library target ##################################################
 
 ## Create target
 add_library(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_TARGET_TYPE}
@@ -130,6 +137,8 @@ target_include_directories(${${PROJECT_NAME}_TARGET} PUBLIC
                            $<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIR}>
                            )
 
+## Optional targets ############################################################
+
 ## Optionally enable tests
 if (${PROJECT_NAME}_BUILD_TESTS)
     include(CTest)
@@ -148,6 +157,8 @@ endif ()
 if (${PROJECT_NAME}_BUILD_DOCS)
     add_subdirectory(docs)
 endif ()
+
+## Install targets #############################################################
 
 install(TARGETS ${${PROJECT_NAME}_TARGET}
         EXPORT ${PROJECT_NAME}Targets
@@ -182,8 +193,42 @@ install(EXPORT ${PROJECT_NAME}Targets
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
                "${PROJECT_NAME}Config.cmake"
                @ONLY)
+
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
         )
+
+## CPack distribution ##########################################################
+
+## Windows Installer GUID generator
+include(WinInstallerGUID)
+
+## CPack settings
+set(CPACK_GENERATOR "TXZ")
+set(CPACK_SOURCE_GENERATOR "TXZ")
+# Binary packages
+set(CPACK_PACKAGE_NAME "MikroTikAPI")
+set(CPACK_PACKAGE_VENDOR "bodand")
+set(CPACK_PACKAGE_DESCRIPTION "A Modern C++ wrapper for the MikroTik API")
+set(CPACK_PACKAGE_CHECKSUM SHA3_256)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_FILE_NAME
+    "${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${${PROJECT_NAME}_TARGET_TYPE}-${CMAKE_CXX_COMPILER_ID}")
+# Source packages
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "mikrotikapi-src-${PROJECT_VERSION}")
+## CPack WIX
+WinInstallerGUID(UP_GUID PROD_GUID)
+set(CPACK_WIX_UPGRADE_GUID "${UP_GUID}")
+set(CPACK_WIX_PRODUCT_GUID "${PROD_GUID}")
+set(CPACK_WIX_LICENSE_RTF "${CMAKE_SOURCE_DIR}/LICENSE.rtf")
+set(CPACK_WIX_CMAKE_PACKAGE_REGISTRY MikroTikAPI)
+set(CPACK_WIX_PROPERTY_ARPHELPLINK "https://github.com/bodand/MikroTikAPI")
+set(CPACK_WIX_PROPERTY_ARPURLINFOABOUT "https://mikrotikapi.rtfd.io/")
+set(CPACK_WIX_PROPERTY_UPDATEINFO "https://github.com/bodand/MikroTikAPI/releases")
+## Register CPack
+include(CPack)

@@ -10,6 +10,15 @@ when the next major version rolls along.
 Minor and major versions get their own code-names, patch versions
 append a number to the code-name of the version they are patching.
 
+## VERSION v1.1.1 - Teius teyou-2
+
+Version v1.1.1 adds binary distributions. Nothing in the API has changed,
+and everything is completely API and ABI compatible with v1.1.0.
+
+### Added:
+ - Binary distributions on GitHub Releases.
+ - LICENSE is now available in RTF format.
+
 ## VERSION v1.1.0 - Teius teyou
 
 Version v1.1.0 is now ready. It mostly adds the documentation, with
