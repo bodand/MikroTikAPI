@@ -202,33 +202,36 @@ install(FILES
 
 ## CPack distribution ##########################################################
 
-## Windows Installer GUID generator
-include(WinInstallerGUID)
+if ("${${PROJECT_NAME}_MAIN}")
 
-## CPack settings
-set(CPACK_GENERATOR "TXZ")
-set(CPACK_SOURCE_GENERATOR "TXZ")
-# Binary packages
-set(CPACK_PACKAGE_NAME "MikroTikAPI")
-set(CPACK_PACKAGE_VENDOR "bodand")
-set(CPACK_PACKAGE_DESCRIPTION "A Modern C++ wrapper for the MikroTik API")
-set(CPACK_PACKAGE_CHECKSUM SHA3_256)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
-set(CPACK_PACKAGE_FILE_NAME
-    "${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${${PROJECT_NAME}_TARGET_TYPE}-${CMAKE_CXX_COMPILER_ID}")
-# Source packages
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "mikrotikapi-src-${PROJECT_VERSION}")
-## CPack WIX
-WinInstallerGUID(UP_GUID PROD_GUID)
-set(CPACK_WIX_UPGRADE_GUID "${UP_GUID}")
-set(CPACK_WIX_PRODUCT_GUID "${PROD_GUID}")
-set(CPACK_WIX_LICENSE_RTF "${CMAKE_SOURCE_DIR}/LICENSE.rtf")
-set(CPACK_WIX_CMAKE_PACKAGE_REGISTRY MikroTikAPI)
-set(CPACK_WIX_PROPERTY_ARPHELPLINK "https://github.com/bodand/MikroTikAPI")
-set(CPACK_WIX_PROPERTY_ARPURLINFOABOUT "https://mikrotikapi.rtfd.io/")
-set(CPACK_WIX_PROPERTY_UPDATEINFO "https://github.com/bodand/MikroTikAPI/releases")
-## Register CPack
-include(CPack)
+    ## Windows Installer GUID generator
+    include(WinInstallerGUID)
+
+    ## CPack settings
+    set(CPACK_GENERATOR "TXZ")
+    set(CPACK_SOURCE_GENERATOR "TXZ")
+    # Binary packages
+    set(CPACK_PACKAGE_NAME "MikroTikAPI")
+    set(CPACK_PACKAGE_VENDOR "bodand")
+    set(CPACK_PACKAGE_DESCRIPTION "A Modern C++ wrapper for the MikroTik API")
+    set(CPACK_PACKAGE_CHECKSUM SHA3_256)
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+    set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+    set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+    set(CPACK_PACKAGE_FILE_NAME
+        "${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${${PROJECT_NAME}_TARGET_TYPE}-${CMAKE_CXX_COMPILER_ID}")
+    # Source packages
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME "mikrotikapi-src-${PROJECT_VERSION}")
+    ## CPack WIX
+    WinInstallerGUID(UP_GUID PROD_GUID)
+    set(CPACK_WIX_UPGRADE_GUID "${UP_GUID}")
+    set(CPACK_WIX_PRODUCT_GUID "${PROD_GUID}")
+    set(CPACK_WIX_LICENSE_RTF "${CMAKE_SOURCE_DIR}/LICENSE.rtf")
+    set(CPACK_WIX_CMAKE_PACKAGE_REGISTRY MikroTikAPI)
+    set(CPACK_WIX_PROPERTY_ARPHELPLINK "https://github.com/bodand/MikroTikAPI")
+    set(CPACK_WIX_PROPERTY_ARPURLINFOABOUT "https://mikrotikapi.rtfd.io/")
+    set(CPACK_WIX_PROPERTY_UPDATEINFO "https://github.com/bodand/MikroTikAPI/releases")
+    ## Register CPack
+    include(CPack)
+endif ()

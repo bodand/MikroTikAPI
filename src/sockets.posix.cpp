@@ -749,7 +749,7 @@ mikrotik::api::impl::socket::string_error(int err) noexcept {
         return "ENOPOLICY";
 #endif
 #ifdef ENOPROTOOPT
-    case EPROTONOSUPPORT:
+    case ENOPROTOOPT:
         return "protocol is not supported within this domain (EPROTONOSUPPORT)";
 #endif
 #ifdef ENOREG
